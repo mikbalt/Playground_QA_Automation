@@ -20,13 +20,37 @@ Selamat datang di QA Automation Playground! Sebelum mulai, pahami dulu mindset-n
 
 3. **Ikuti urutan belajar:** DAY 1 (API) -> DAY 2 (UI + BDD) -> DAY 3 (Load + Polish)
 
-4. **Target aplikasi yang kita test:**
+4. **Semua test sudah diverifikasi jalan (hasil nyata):**
+
+   | Layer | Tool | Tests | Hasil |
+   |-------|------|-------|-------|
+   | API (Python) | pytest + httpx + pydantic | 35 | 35 passed |
+   | API (TypeScript) | Vitest + Zod | 15 | 15 passed |
+   | UI (Python) | Playwright + POM | 15 | 15 passed |
+   | UI (TypeScript) | Playwright | 8 | 8 passed |
+   | BDD | pytest-bdd + Gherkin | 9 | 9 passed |
+   | Load (k6) | k6 smoke | 1 min, 18 iterations | All thresholds passed |
+   | Load (Locust) | Locust headless | 30s, 73 requests | 0% failure rate |
+   | **Total** | | **82+ tests** | **All passing** |
+
+5. **Semua tools 100% GRATIS:**
+
+   | Tool/Service | Biaya | Perlu Daftar? |
+   |-------------|-------|---------------|
+   | saucedemo.com | Gratis | Tidak perlu |
+   | dummyjson.com | Gratis | Tidak perlu |
+   | countries.trevorblades.com | Gratis | Tidak perlu |
+   | GitHub Actions | Gratis (2000 menit/bulan) | Perlu akun GitHub |
+   | Playwright, pytest, k6, Locust | Gratis, open source | -- |
+   | Allure Report | Gratis, open source | -- |
+
+6. **Target aplikasi yang kita test:**
 
    | App | URL | Kegunaan | Credentials |
    |-----|-----|----------|-------------|
-   | DummyJSON | https://dummyjson.com | REST API testing | `emilys` / `emilyspass` |
+   | DummyJSON | https://dummyjson.com | REST API testing + Load testing | `emilys` / `emilyspass` |
    | Countries API | https://countries.trevorblades.com/graphql | GraphQL testing | Tidak perlu login |
-   | Sauce Demo | https://www.saucedemo.com | UI/E2E testing | `standard_user` / `secret_sauce` |
+   | Sauce Demo | https://www.saucedemo.com | UI/E2E testing + BDD | `standard_user` / `secret_sauce` |
 
 ---
 
@@ -1116,8 +1140,10 @@ Average bisa menyesatkan. Kalau 99 request selesai dalam 10ms dan 1 request butu
 ### 3.2 Jalankan k6
 
 **Install k6:**
-- Download dari https://k6.io/docs/get-started/installation/
-- Windows: `winget install k6` atau download binary
+- Windows: `winget install GrafanaLabs.k6`
+- macOS: `brew install k6`
+- Linux: lihat https://k6.io/docs/get-started/installation/
+- Verifikasi: `k6 version` (harus muncul versi k6)
 
 **Jalankan Smoke Test:**
 ```bash
@@ -1151,6 +1177,39 @@ Yang paling penting dilihat:
 - `http_req_duration p(95)` -- Harus di bawah threshold (di kode: `p(95)<500`)
 - `http_req_failed` -- Harus mendekati 0%
 - `checks` -- Semua check harus 100%
+
+**Contoh output nyata dari smoke test kita:**
+
+```
+  █ THRESHOLDS
+
+    http_req_duration
+    ✓ 'p(95)<500' p(95)=245.4ms
+
+    http_req_failed
+    ✓ 'rate<0.01' rate=0.00%
+
+  █ TOTAL RESULTS
+
+    checks_total.......: 108     1.72/s
+    checks_succeeded...: 100.00% 108 out of 108
+    checks_failed......: 0.00%   0 out of 108
+
+    ✓ login status is 200
+    ✓ login returns token
+    ✓ products status is 200
+    ✓ products returns data
+    ✓ product status is 200
+    ✓ product has title
+
+    HTTP
+    http_req_duration..: avg=157ms min=9ms med=192ms max=754ms p(90)=221ms p(95)=245ms
+    http_req_failed....: 0.00%  0 out of 54
+    http_reqs..........: 54     0.86/s
+    iterations.........: 18     0.29/s
+```
+
+**Cara baca:** Semua threshold PASS (tanda ✓), 108 checks semuanya sukses, 0% error rate, dan p(95) = 245ms jauh di bawah limit 500ms. Artinya DummyJSON API cukup responsif untuk 1 user.
 
 ---
 
@@ -1259,11 +1318,44 @@ http://localhost:8089
 - Spawn rate: `2` (berapa user baru per detik)
 - Klik **Start Swarming**
 
-**Dashboard Locust menampilkan:**
+**Atau jalankan headless (tanpa browser, langsung di terminal):**
+```bash
+python -m locust -f load-tests/locust/locustfile.py --host=https://dummyjson.com --headless -u 5 -r 2 -t 30s
+```
+- `-u 5` = 5 virtual users
+- `-r 2` = spawn 2 user per detik
+- `-t 30s` = jalankan selama 30 detik
+
+**Dashboard Locust (web UI mode) menampilkan:**
 - Real-time RPS (requests per second)
 - Response time graph
 - Failure rate
 - Per-endpoint breakdown
+
+**Contoh output nyata dari Locust headless kita:**
+
+```
+Type     Name                          # reqs   # fails |   Avg   Min   Max   Med | req/s
+---------|------------------------------|--------|--------|-------|-----|-----|-----|------
+POST     /auth/login                        5  0(0.00%) |   213   199   236   210 |  0.17
+POST     /carts/add                        13  0(0.00%) |   186   184   191   190 |  0.45
+GET      /products                         27  0(0.00%) |   197   188   276   190 |  0.92
+GET      /products/[id]                    21  0(0.00%) |   180    10   195   190 |  0.72
+GET      /products/search                   7  0(0.00%) |   191   186   198   190 |  0.24
+---------|------------------------------|--------|--------|-------|-----|-----|-----|------
+         Aggregated                        73  0(0.00%) |   191    10   276   190 |  2.50
+
+Response time percentiles (approximated)
+Type     Name                            50%    75%    90%    95%    99%   100%
+---------|-------------------------------|------|------|------|------|------|------
+POST     /auth/login                      210    220    240    240    240    240
+POST     /carts/add                       190    190    190    190    190    190
+GET      /products                        190    200    200    230    280    280
+GET      /products/[id]                   190    190    190    200    200    200
+GET      /products/search                 190    200    200    200    200    200
+```
+
+**Cara baca:** 73 total requests, **0% failure**, semua endpoint rata-rata di bawah 200ms. P95 tertinggi adalah `/auth/login` di 240ms. Performa DummyJSON sangat stabil bahkan dengan 5 concurrent users.
 
 ---
 
