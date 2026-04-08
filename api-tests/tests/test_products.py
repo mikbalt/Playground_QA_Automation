@@ -1,6 +1,7 @@
 import allure
 import httpx
 import pytest
+import logging
 
 from models.product import Product, ProductsResponse
 
@@ -189,3 +190,18 @@ class TestProducts:
         assert response.status_code == 200
         data = ProductsResponse(**response.json())
         assert data.total > 0
+
+    @allure.story("Search Laptop Products")
+    @allure.title("Search for laptops returns relevant products")
+    @pytest.mark.smoke
+    def test_search_laptop_products(self, client: httpx.Client):
+        response = client.get("/products/search", params={"q":"laptop"})
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["products"]) > 0
+        for product in data["products"]:
+            assert (
+                "laptop" in product["title"].lower()
+                or "laptop" in product["description"].lower()
+                or "laptop" in product["category"].lower()
+            )

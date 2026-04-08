@@ -91,7 +91,8 @@ cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
 python -m venv venv
 
 # Aktivasi (di Git Bash / terminal)
-source venv/Scripts/activate
+source venv/Scripts/activate // or
+source venv/bin/activate
 
 # Kalau pakai CMD:
 # venv\Scripts\activate
