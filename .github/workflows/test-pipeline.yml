@@ -1,0 +1,118 @@
+name: QA Automation Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  api-tests:
+    name: API Tests (Python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: pip install -r api-tests/requirements.txt
+      - name: Run smoke tests
+        run: pytest api-tests/ --alluredir=reports/allure-results -m smoke -v
+      - name: Run all API tests
+        run: pytest api-tests/ --alluredir=reports/allure-results -v
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-api
+          path: reports/allure-results
+
+  api-tests-ts:
+    name: API Tests (TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: api-tests/typescript
+        run: npm install
+      - name: Run tests
+        working-directory: api-tests/typescript
+        run: npm test
+
+  ui-tests-python:
+    name: UI Tests (Python Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -r api-tests/requirements.txt
+          playwright install --with-deps chromium
+      - name: Run UI tests
+        run: pytest ui-tests/python/ --browser=chromium --alluredir=reports/allure-results -v
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-ui
+          path: reports/allure-results
+
+  ui-tests-ts:
+    name: UI Tests (TypeScript Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        working-directory: ui-tests/typescript
+        run: |
+          npm install
+          npx playwright install --with-deps chromium
+      - name: Run tests
+        working-directory: ui-tests/typescript
+        run: npx playwright test --project=chromium
+      - name: Upload Playwright Report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report
+          path: ui-tests/typescript/playwright-report
+
+  bdd-tests:
+    name: BDD Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: |
+          pip install -r api-tests/requirements.txt
+          playwright install --with-deps chromium
+      - name: Run BDD tests
+        run: pytest bdd/ --alluredir=reports/allure-results -v
+      - name: Upload Allure Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: allure-results-bdd
+          path: reports/allure-results
+
+  load-tests:
+    name: Load Tests (k6 Smoke)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: grafana/setup-k6-action@v1
+      - name: Run k6 smoke test
+        run: k6 run load-tests/k6/scenarios/smoke.js
