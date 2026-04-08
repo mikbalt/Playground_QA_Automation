@@ -1,12 +1,12 @@
 # QA Automation Playground
 
-A comprehensive, portfolio-ready QA automation project demonstrating API testing, UI end-to-end testing, load/performance testing, and BDD -- built with both Python and TypeScript toolchains against real-world practice applications.
+A comprehensive, portfolio-ready QA automation project demonstrating **API testing, UI E2E testing, Load/Performance testing, and BDD** — built with both **Python & TypeScript** against real-world practice applications.
+
+> Lihat [LEARNING_GUIDE.md](LEARNING_GUIDE.md) untuk panduan belajar step-by-step.
 
 ---
 
-![API Tests](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/qa-automation-playground/api-tests.yml?label=API%20Tests&style=flat-square)
-![UI Tests](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/qa-automation-playground/ui-tests.yml?label=UI%20Tests&style=flat-square)
-![Load Tests](https://img.shields.io/github/actions/workflow/status/YOUR_USERNAME/qa-automation-playground/load-tests.yml?label=Load%20Tests&style=flat-square)
+![API Tests](https://img.shields.io/github/actions/workflow/status/mikbalt/Playground_QA_Automation/test-pipeline.yml?label=CI%20Pipeline&style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)
 
 ---
@@ -14,42 +14,45 @@ A comprehensive, portfolio-ready QA automation project demonstrating API testing
 ## Architecture
 
 ```
-+---------------------+       +---------------------------+
-|   Test Suites       |       |   Target Applications     |
-|                     |       |                           |
-|  API Tests  --------+------>|  DummyJSON API            |
-|  (pytest + httpx)   |       |  https://dummyjson.com    |
-|                     |       |                           |
-|  UI Tests  ---------+------>|  Sauce Demo               |
-|  (Playwright)       |       |  https://saucedemo.com    |
-|                     |       |                           |
-|  Load Tests  -------+------>|  DummyJSON API            |
-|  (Locust / k6)      |       |  https://dummyjson.com    |
-|                     |       |                           |
-|  BDD Tests  --------+------>|  Sauce Demo               |
-|  (behave/Gherkin)   |       |  https://saucedemo.com    |
-+---------------------+       +---------------------------+
-         |
-         v
-+---------------------+
-|   Reporting         |
-|  Allure  |  k6 HTML |
-+---------------------+
+┌─────────────────────┐       ┌──────────────────────────┐
+│   Test Suites        │       │   Target Applications     │
+│                      │       │                           │
+│  API Tests (Python)  ├──────►│  DummyJSON REST API       │
+│  pytest + httpx      │       │  https://dummyjson.com    │
+│                      │       │                           │
+│  API Tests (TS)      ├──────►│  Countries GraphQL API    │
+│  Vitest + Zod        │       │  countries.trevorblades.. │
+│                      │       │                           │
+│  UI Tests (Py + TS)  ├──────►│  Sauce Demo               │
+│  Playwright POM      │       │  https://saucedemo.com    │
+│                      │       │                           │
+│  BDD (Gherkin)       ├──────►│  Sauce Demo               │
+│  pytest-bdd          │       │                           │
+│                      │       │                           │
+│  Load Tests          ├──────►│  DummyJSON REST API       │
+│  k6 + Locust         │       │                           │
+└──────────┬───────────┘       └───────────────────────────┘
+           │
+           ▼
+┌──────────────────────┐
+│   Reporting           │
+│  Allure  │  k6 HTML   │
+└──────────────────────┘
 ```
 
 ---
 
 ## Tech Stack
 
-| Area            | Python                          | TypeScript                |
-| --------------- | ------------------------------- | ------------------------- |
-| Test Runner     | pytest                          | vitest                    |
-| HTTP Client     | httpx                           | fetch / Playwright API    |
-| Validation      | pydantic                        | zod                       |
-| UI Automation   | playwright (Python)             | playwright (TS)           |
-| Load Testing    | locust                          | k6                        |
-| BDD             | behave                          | --                        |
-| Reporting       | allure-pytest                   | allure / k6 HTML          |
+| Area | Python | TypeScript/JS |
+|---|---|---|
+| Test Runner | pytest | Vitest / Playwright Test |
+| HTTP Client | httpx | native fetch |
+| Schema Validation | Pydantic v2 | Zod |
+| UI Automation | Playwright (sync) | Playwright |
+| Load Testing | Locust | k6 |
+| BDD | pytest-bdd + Gherkin | — |
+| Reporting | allure-pytest | k6 HTML / Playwright HTML |
 
 ---
 
@@ -57,78 +60,75 @@ A comprehensive, portfolio-ready QA automation project demonstrating API testing
 
 ### Prerequisites
 
-- Python 3.11+
-- Node.js 20+
-- Git
+- **Python 3.12+** (64-bit) — [python.org](https://python.org)
+- **Node.js 20+** — [nodejs.org](https://nodejs.org)
+- **Git** — [git-scm.com](https://git-scm.com)
 
-### Clone
-
-```bash
-git clone https://github.com/YOUR_USERNAME/qa-automation-playground.git
-cd qa-automation-playground
-```
-
-### Python Setup
+### 1. Clone & Setup
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate      # Linux/macOS
-.venv\Scripts\activate         # Windows
+git clone https://github.com/mikbalt/Playground_QA_Automation.git
+cd Playground_QA_Automation
 
-pip install -r requirements.txt
+# Python dependencies
+pip install -r api-tests/requirements.txt
 playwright install chromium
+
+# TypeScript dependencies
+cd api-tests/typescript && npm install && cd ../..
+cd ui-tests/typescript && npm install && npx playwright install chromium && cd ../..
 ```
 
-### TypeScript Setup
+### 2. Run Tests
 
 ```bash
-npm install
-npx playwright install chromium
+# ── API Tests (Python) ──
+python -m pytest api-tests/tests/ -v -p no:playwright
+
+# ── API Tests (TypeScript) ──
+cd api-tests/typescript && npx vitest run
+
+# ── UI Tests (Python Playwright) ──
+python -m pytest ui-tests/python/tests/ -v
+
+# ── UI Tests (TypeScript Playwright) ──
+cd ui-tests/typescript && npx playwright test --project=chromium
+
+# ── BDD Tests ──
+python -m pytest bdd/ -v
+
+# ── Load Tests (k6) ──
+k6 run load-tests/k6/scenarios/smoke.js
+
+# ── Load Tests (Locust) ──
+python -m locust -f load-tests/locust/locustfile.py --host=https://dummyjson.com
 ```
 
-### Run Tests
+### 3. Generate Reports
 
 ```bash
-# --- Python ---
-pytest tests/api/ -v                          # API tests
-pytest tests/ui/ -v                           # UI E2E tests
-locust -f tests/load/locustfile.py --headless # Load tests (headless)
-pytest tests/bdd/ -v                          # BDD tests
-
-# --- TypeScript ---
-npx vitest run tests/api                      # API tests
-npx playwright test tests/ui                  # UI E2E tests
-k6 run tests/load/smoke.js                    # Load tests
-```
-
-### Generate Reports
-
-```bash
-# Allure (Python)
-pytest tests/ --alluredir=reports/allure-results
+# Allure Report
+python -m pytest api-tests/tests/ --alluredir=reports/allure-results -v
 allure serve reports/allure-results
 
-# k6 HTML
-k6 run --out json=reports/k6-results.json tests/load/smoke.js
+# Playwright HTML Report
+cd ui-tests/typescript && npx playwright show-report
 ```
 
 ---
 
-## Test Coverage Summary
+## Test Coverage
 
-| Layer      | Count          | Description                                          |
-| ---------- | -------------- | ---------------------------------------------------- |
-| API Tests  | 25 test cases  | Auth, products CRUD, carts, users, search, pagination |
-| UI Tests   | 15 E2E flows   | Login, inventory, cart, checkout, sorting, logout      |
-| Load Tests | 3 scenarios    | Smoke (10 VUs), Average (50 VUs), Stress (200 VUs)    |
-| BDD        | 5 scenarios    | Login, add-to-cart, checkout (Gherkin feature files)   |
-
----
-
-## Reports
-
-- **Allure** -- rich HTML reports with step-level detail, screenshots on failure, and historical trend charts. Generated from pytest runs.
-- **k6 HTML / JSON** -- throughput, latency percentiles (p50/p95/p99), error rates, and VU concurrency graphs for load test scenarios.
+| Layer | Count | Framework | Target App |
+|---|---|---|---|
+| API (Python) | 35 tests | pytest + httpx + pydantic | DummyJSON + Countries API |
+| API (TypeScript) | 15 tests | Vitest + Zod | DummyJSON |
+| UI (Python) | 15 tests | Playwright + POM | Sauce Demo |
+| UI (TypeScript) | 8 tests | Playwright | Sauce Demo |
+| BDD | 9 scenarios | pytest-bdd + Gherkin | Sauce Demo |
+| Load | 4 scenarios | k6 | DummyJSON |
+| Load | 1 config | Locust | DummyJSON |
+| **Total** | **87 tests** | | |
 
 ---
 
@@ -136,55 +136,71 @@ k6 run --out json=reports/k6-results.json tests/load/smoke.js
 
 ```
 qa-automation-playground/
-|-- python/
-|   |-- tests/
-|   |   |-- api/              # API test modules (pytest + httpx)
-|   |   |-- ui/               # UI E2E tests (Playwright Python)
-|   |   |-- load/             # Load tests (Locust)
-|   |   |-- bdd/
-|   |   |   |-- features/     # Gherkin .feature files
-|   |   |   |-- steps/        # Step definitions
-|   |   |-- conftest.py       # Shared fixtures
-|   |-- src/
-|   |   |-- models/           # Pydantic response models
-|   |   |-- clients/          # HTTP client wrappers
-|   |   |-- pages/            # Page Object Model classes
-|   |   |-- utils/            # Helpers, data generators
-|   |-- requirements.txt
-|   |-- pytest.ini
-|
-|-- typescript/
-|   |-- tests/
-|   |   |-- api/              # API tests (vitest + zod)
-|   |   |-- ui/               # UI E2E tests (Playwright TS)
-|   |   |-- load/             # k6 load test scripts
-|   |-- src/
-|   |   |-- schemas/          # Zod validation schemas
-|   |   |-- clients/          # HTTP client wrappers
-|   |   |-- pages/            # Page Object Model classes
-|   |-- package.json
-|   |-- tsconfig.json
-|   |-- playwright.config.ts
-|   |-- vitest.config.ts
-|
-|-- target-apps/
-|   |-- APPS.md               # Documentation of all target applications
-|
-|-- reports/                  # Generated reports (gitignored)
-|-- .github/
-|   |-- workflows/
-|       |-- api-tests.yml
-|       |-- ui-tests.yml
-|       |-- load-tests.yml
-|
-|-- README.md
-|-- TEST_STRATEGY.md
-|-- CONTRIBUTING.md
-|-- LICENSE
+├── README.md                          ← Kamu di sini
+├── LEARNING_GUIDE.md                  ← Panduan belajar day-by-day
+├── TEST_STRATEGY.md                   ← Dokumen strategi (level senior)
+├── CONTRIBUTING.md                    ← Naming conventions & rules
+│
+├── target-apps/
+│   └── APPS.md                        ← Dokumentasi target apps
+│
+├── api-tests/                         ← Python: pytest + httpx
+│   ├── conftest.py                    ← Fixtures (base_url, auth_token, client)
+│   ├── requirements.txt               ← Python dependencies
+│   ├── models/                        ← Pydantic v2 schema models
+│   ├── clients/                       ← HTTP client abstraction
+│   ├── tests/
+│   │   ├── test_auth.py               ← 7 auth tests
+│   │   ├── test_products.py           ← 14+ product tests
+│   │   ├── test_cart.py               ← 6 cart tests
+│   │   └── test_graphql.py            ← 6 GraphQL tests
+│   ├── typescript/                    ← Vitest + Zod
+│   │   ├── auth.test.ts
+│   │   ├── products.test.ts
+│   │   └── cart.test.ts
+│   └── postman/
+│       └── dummyjson.collection.json  ← Postman collection (11 requests)
+│
+├── ui-tests/
+│   ├── python/                        ← Playwright Python + POM
+│   │   ├── pages/                     ← Page Object classes
+│   │   ├── components/                ← Reusable UI components
+│   │   ├── tests/                     ← 15 E2E test cases
+│   │   └── data/                      ← Test data (users, credentials)
+│   └── typescript/                    ← Playwright TypeScript
+│       ├── pages/                     ← Page Object classes
+│       └── tests/                     ← 8 E2E test specs
+│
+├── bdd/                               ← Gherkin + pytest-bdd
+│   ├── features/                      ← .feature files (login, checkout, product)
+│   ├── steps/                         ← Step definitions (test_*.py)
+│   └── conftest.py                    ← Browser fixtures + shared steps
+│
+├── load-tests/
+│   ├── k6/scenarios/                  ← smoke, load, stress, checkout_load
+│   │   └── thresholds.js             ← Shared threshold configs
+│   └── locust/
+│       └── locustfile.py              ← Locust load test config
+│
+├── reports/                           ← Generated (gitignored)
+│
+└── .github/workflows/
+    └── test-pipeline.yml              ← CI/CD: 6 parallel jobs
 ```
+
+---
+
+## Documentation
+
+| Document | Isi |
+|---|---|
+| [LEARNING_GUIDE.md](LEARNING_GUIDE.md) | Panduan belajar 3 hari, step-by-step, ada latihan mandiri |
+| [TEST_STRATEGY.md](TEST_STRATEGY.md) | Test strategy document (scope, risk, DoD) |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Naming conventions, PR guidelines |
+| [target-apps/APPS.md](target-apps/APPS.md) | Dokumentasi semua target app + credentials |
 
 ---
 
 ## License
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
+MIT
