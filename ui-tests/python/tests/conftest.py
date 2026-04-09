@@ -12,10 +12,11 @@ from pages.login_page import LoginPage
 
 
 @pytest.fixture(scope="session")
-def browser():
+def browser(request):
     """Launch a Chromium browser instance for the entire test session."""
+    headless = not request.config.getoption("--headed", default=False)
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=headless)
         yield browser
         browser.close()
 
