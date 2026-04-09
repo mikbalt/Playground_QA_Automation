@@ -85,7 +85,7 @@ Virtual environment itu ibarat "ruangan khusus" buat project ini, supaya package
 
 ```bash
 # Masuk ke folder project
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 
 # Buat virtual environment
 python -m venv venv
@@ -130,11 +130,11 @@ Ini download browser Chromium yang akan dipakai buat UI testing. Ukurannya sekit
 
 ```bash
 # Untuk API tests TypeScript
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/api-tests/typescript
+cd /qa-automation-playground/api-tests/typescript
 npm install
 
 # Untuk UI tests TypeScript
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 npm install
 npx playwright install chromium
 ```
@@ -207,7 +207,7 @@ Pastikan kamu sudah di folder project dan virtual environment aktif.
 
 **Jalankan semua API tests:**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m pytest api-tests/tests/ -v -p no:playwright
 ```
 
@@ -533,7 +533,7 @@ Perhatikan juga pattern `__enter__` dan `__exit__` -- ini supaya bisa dipakai de
 ### 1.4 Jalankan API Tests TypeScript
 
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/api-tests/typescript
+cd /qa-automation-playground/api-tests/typescript
 npm install        # Install dependencies (cuma sekali)
 npx vitest run     # Jalankan semua tests
 ```
@@ -688,7 +688,7 @@ Kalau UI berubah (misalnya locator berubah), kamu cuma perlu edit di SATU file p
 
 **Jalankan semua UI tests (headless -- tanpa browser terlihat):**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m pytest ui-tests/python/tests/ -v
 ```
 
@@ -927,7 +927,7 @@ Bandingkan kalau tanpa POM -- akan penuh dengan `page.locator(...)` di mana-mana
 ### 2.4 Jalankan UI Tests TypeScript
 
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 
 # Install (pertama kali)
 npm install
@@ -1072,7 +1072,7 @@ def verify_inventory_page(page: Page):
 
 **Jalankan BDD tests:**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m pytest bdd/ -v
 ```
 
@@ -1100,7 +1100,7 @@ Record flow: login -> add 2 items -> go to cart -> remove 1 item -> checkout. Li
 
 **Latihan 4: Cross-browser testing**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 npx playwright test               # Jalankan di semua browser
 ```
 Lihat apakah ada test yang pass di Chromium tapi fail di Firefox/WebKit.
@@ -1148,17 +1148,17 @@ Average bisa menyesatkan. Kalau 99 request selesai dalam 10ms dan 1 request butu
 
 **Jalankan Smoke Test:**
 ```bash
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/smoke.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/smoke.js
 ```
 
 **Jalankan Load Test:**
 ```bash
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/load.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/load.js
 ```
 
 **Jalankan Stress Test:**
 ```bash
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/stress.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/stress.js
 ```
 
 **Cara baca output k6:**
@@ -1305,7 +1305,7 @@ export default function () {
 
 **Jalankan Locust:**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m locust -f load-tests/locust/locustfile.py --host=https://dummyjson.com
 ```
 
@@ -1424,7 +1424,7 @@ Total weight = 3+2+1+1 = 7. Jadi browse_products dipanggil 3/7 = 43% dari waktu.
 
 **Generate dan lihat report:**
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 
 # Step 1: Jalankan tests dengan output Allure
 python -m pytest api-tests/tests/ --alluredir=reports/allure-results -v -p no:playwright
@@ -1647,7 +1647,7 @@ Di k6, semua ini bisa didefinisikan sebagai thresholds yang otomatis fail kalau 
 ### Setup (Pertama Kali)
 ```bash
 # Virtual environment
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m venv venv
 source venv/Scripts/activate
 
@@ -1658,18 +1658,18 @@ pip install httpx pydantic pytest allure-pytest pytest-bdd playwright locust
 python -m playwright install chromium
 
 # Node.js packages - API tests
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/api-tests/typescript
+cd /qa-automation-playground/api-tests/typescript
 npm install
 
 # Node.js packages - UI tests
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 npm install
 npx playwright install chromium
 ```
 
 ### API Tests (DAY 1)
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 
 # Semua API tests Python
 python -m pytest api-tests/tests/ -v -p no:playwright
@@ -1684,13 +1684,13 @@ python -m pytest api-tests/tests/ -m regression -v -p no:playwright
 python -m pytest api-tests/tests/ -m negative -v -p no:playwright
 
 # API tests TypeScript
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/api-tests/typescript
+cd /qa-automation-playground/api-tests/typescript
 npx vitest run
 ```
 
 ### UI Tests (DAY 2)
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 
 # UI tests Python (headless)
 python -m pytest ui-tests/python/tests/ -v
@@ -1702,32 +1702,32 @@ python -m pytest ui-tests/python/tests/ -v --headed
 python -m playwright codegen https://www.saucedemo.com
 
 # UI tests TypeScript
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 npx playwright test --project=chromium
 npx playwright test --headed
 npx playwright show-report
 
 # BDD tests
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m pytest bdd/ -v
 ```
 
 ### Load Tests (DAY 3)
 ```bash
 # k6
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/smoke.js
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/load.js
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/stress.js
-k6 run C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/load-tests/k6/scenarios/checkout_load.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/smoke.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/load.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/stress.js
+k6 run /qa-automation-playground/load-tests/k6/scenarios/checkout_load.js
 
 # Locust (opens web UI at http://localhost:8089)
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 python -m locust -f load-tests/locust/locustfile.py --host=https://dummyjson.com
 ```
 
 ### Reports
 ```bash
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground
+cd /qa-automation-playground
 
 # Generate Allure results
 python -m pytest api-tests/tests/ --alluredir=reports/allure-results -v -p no:playwright
@@ -1736,7 +1736,7 @@ python -m pytest api-tests/tests/ --alluredir=reports/allure-results -v -p no:pl
 allure serve reports/allure-results
 
 # Playwright HTML report
-cd C:/Users/Admin/Pictures/Learne2e/qa-automation-playground/ui-tests/typescript
+cd /qa-automation-playground/ui-tests/typescript
 npx playwright show-report
 ```
 
